@@ -1,5 +1,5 @@
 // src/pages/NameInput.js
-import React from 'react';
+import React, { useState } from 'react';
 import { useAtom } from 'jotai';
 import { Link } from 'react-router-dom';
 import { Container, TextField, Button } from '@mui/material';
@@ -7,10 +7,15 @@ import { userNameAtom } from '../store';
 import RankingList from '../components/RankingList';
 
 function NameInput() {
-	const [name, setName] = useAtom(userNameAtom);
+	const [, setName] = useAtom(userNameAtom);
+	const [localName, setLocalName] = useState(''); // useState로 로컬 상태 관리
 
 	const handleChange = (event) => {
-		setName(event.target.value);
+		setLocalName(event.target.value);
+	};
+
+	const handleValueToGlobal = () => {
+		setName(localName);
 	};
 
 	return (
@@ -20,16 +25,21 @@ function NameInput() {
 				label="이름"
 				variant="outlined"
 				fullWidth
-				value={name}
+				value={localName}
 				onChange={handleChange}
 				margin="normal"
-				autoComplete="off" // 자동완성 비활성화
+				autoComplete="off"
 			/>
 			<Link to="/game">
-				<Button variant="contained" color="primary" fullWidth>
+				<Button
+					variant="contained"
+					color="primary"
+					fullWidth
+					onClick={handleValueToGlobal}>
 					게임 시작
 				</Button>
 			</Link>
+
 			<RankingList />
 		</Container>
 	);
