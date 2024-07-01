@@ -31,11 +31,16 @@ function Game() {
 		const imgElement = event.target;
 		const rect = imgElement.getBoundingClientRect();
 
+		// 이미지의 실제 크기
+		const imgWidth = imgElement.naturalWidth;
+		const imgHeight = imgElement.naturalHeight;
+
 		const xRatio = (event.clientX - rect.left) / rect.width;
 		const yRatio = (event.clientY - rect.top) / rect.height;
 
-		const x = xRatio * 1110;
-		const y = yRatio * 740;
+		// 실제 이미지 크기에 대한 좌표 계산
+		const x = xRatio * imgWidth;
+		const y = yRatio * imgHeight;
 
 		const isCorrect = differences.some(
 			(diff) =>
