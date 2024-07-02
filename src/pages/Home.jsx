@@ -11,14 +11,14 @@ const CenteredContainer = styled(Container)`
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
-	text-align: center; // 텍스트 가운데 정렬
+	text-align: center;
 `;
 
 const Circle = styled.div`
 	background-color: wheat;
+	background: radial-gradient(circle, wheat 0%, white 100%);
 	width: 600px;
 	height: 600px;
-	border: 5px solid wheat;
 	border-radius: 50%;
 	display: flex;
 	flex-direction: column;

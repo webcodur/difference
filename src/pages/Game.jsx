@@ -9,11 +9,10 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { scoreAtom, userNameAtom, rankingAtom } from '../store';
 import { coordinates } from '../assets/coordinates';
-import { Grid } from '@mui/material';
 import {
 	GameContainer,
 	GameTitle,
-	GameInfo,
+	GameInfoWrapper,
 	ImageContainer,
 	ImageMark,
 } from './Game.Style';
@@ -129,7 +128,7 @@ function Game() {
 	};
 
 	const ImageWithMarks = ({ src, diffCoordinates }) => (
-		<ImageContainer item xs={6}>
+		<ImageContainer>
 			<img
 				src={src}
 				alt="이미지"
@@ -146,40 +145,42 @@ function Game() {
 
 	return (
 		<GameContainer>
-			<GameTitle>게임 화면</GameTitle>
-			<GameInfo>
-				현재 라운드: {round + 1} / {coordinates.length}
-			</GameInfo>
-			<GameInfo>
-				찾아야 할 차이점: {foundDifferences.length} / {diffCoordinates.length}
-			</GameInfo>
-			<GameInfo>현재 점수: {score}</GameInfo>
-			<GameInfo>틀린 횟수: {incorrectAttempts}</GameInfo>
-
-			<Swiper
-				spaceBetween={50}
-				slidesPerView={1}
-				navigation={false}
-				pagination={{ clickable: true }}
-				scrollbar={{ draggable: true }}
-				onSlideChange={handleSlideChange}
-				allowTouchMove={false}>
-				{coordinates.map((_, index) => (
-					<SwiperSlide key={index}>
-						<Grid container spacing={3}>
-							<ImageWithMarks
-								src={`/images/img${round + 1}1.jpg`}
-								diffCoordinates={diffCoordinates}
-							/>
-							<ImageWithMarks
-								src={`/images/img${round + 1}2.jpg`}
-								diffCoordinates={diffCoordinates}
-							/>
-						</Grid>
-					</SwiperSlide>
-				))}
-			</Swiper>
-			<GameInfo>클릭 정보: {message}</GameInfo>
+			<>
+				<GameTitle>
+					{round + 1} 라운드 ({round + 1}/{coordinates.length})
+				</GameTitle>
+				<GameInfoWrapper>
+					<p>
+						현재 {diffCoordinates.length}중 {foundDifferences.length}개 찾음
+					</p>
+					<p>점수: {score}점</p>
+					<p>오답: {incorrectAttempts}회</p>
+				</GameInfoWrapper>
+				<Swiper
+					spaceBetween={50}
+					slidesPerView={1}
+					navigation={false}
+					pagination={{ clickable: true }}
+					scrollbar={{ draggable: true }}
+					onSlideChange={handleSlideChange}
+					allowTouchMove={false}>
+					{coordinates.map((_, index) => (
+						<SwiperSlide key={index}>
+							<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+								<ImageWithMarks
+									src={`/images/img${round + 1}1.jpg`}
+									diffCoordinates={diffCoordinates}
+								/>
+								<ImageWithMarks
+									src={`/images/img${round + 1}2.jpg`}
+									diffCoordinates={diffCoordinates}
+								/>
+							</div>
+						</SwiperSlide>
+					))}
+				</Swiper>
+				{message && <div>{message}</div>}
+			</>
 		</GameContainer>
 	);
 }

@@ -1,24 +1,24 @@
 // Game.Style.js
 import styled from '@emotion/styled';
-import { Grid } from '@mui/material';
 
 export const GameContainer = styled.div`
-	max-width: lg;
-	margin: 0 auto;
-	padding: 20px;
+	margin-top: 10vh;
+	height: 80vh;
+	background-color: wheat;
 `;
 
 export const GameTitle = styled.h1`
 	text-align: center;
 `;
 
-export const GameInfo = styled.p`
+export const GameInfoWrapper = styled.p`
 	text-align: center;
 	margin: 10px 0;
 `;
 
-export const ImageContainer = styled(Grid)`
+export const ImageContainer = styled.div`
 	position: relative;
+	width: 48%;
 `;
 
 export const ImageMark = styled.div`

@@ -10,17 +10,13 @@ const FullScreenContainer = styled.div`
 	width: 100vw;
 	height: 100vh;
 	overflow: hidden;
-	display: flex;
-	flex-direction: column;
 `;
 
 const FixedContents = styled.div`
 	position: fixed;
 `;
 
-const StyledContainer = styled(Container)`
-	flex-grow: 1;
-`;
+const StyledContainer = styled(Container)``;
 
 const linkStyle = css`
 	text-decoration: none;
