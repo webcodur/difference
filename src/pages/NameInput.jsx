@@ -42,6 +42,8 @@ const StyledButton = styled(Button)`
 function NameInput() {
 	const [, setName] = useAtom(userNameAtom);
 	const [localName, setLocalName] = useState('');
+	const [gameStartText, setGameStartText] = useState('게임 시작');
+	const [isStarting, setIsStarting] = useState(false);
 	const navigate = useNavigate();
 
 	const handleChange = (event) => {
@@ -49,11 +51,22 @@ function NameInput() {
 	};
 
 	const handleGameStart = () => {
+		if (isStarting) return;
+		setIsStarting(true);
 		setName(localName);
+		setGameStartText('3초 후 시작');
 		playSingleAudio('countdown.wav');
+
+		const countdown = [3, 2, 1];
+		countdown.forEach((time, index) => {
+			setTimeout(() => {
+				setGameStartText(`${time}초 후 시작`);
+			}, index * 1000);
+		});
+
 		setTimeout(() => {
 			navigate('/game');
-		}, 3000); // 1초 후 페이지 이동
+		}, 3000); // 3초 후 페이지 이동
 	};
 
 	return (
@@ -73,8 +86,10 @@ function NameInput() {
 					variant="contained"
 					color="primary"
 					fullWidth
-					onClick={handleGameStart}>
-					게임 시작
+					onClick={handleGameStart}
+					disabled={isStarting} // 시작 중일 때 버튼 비활성화
+				>
+					{gameStartText}
 				</StyledButton>
 
 				<RankingList />

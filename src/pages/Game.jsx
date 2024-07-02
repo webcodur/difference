@@ -125,7 +125,9 @@ function Game() {
 					score,
 					date: new Date().toLocaleString(),
 				},
-			];
+			].sort((a, b) => b.score - a.score); // 점수 내림차순 정렬
+
+			if (newRanking.length > 10) newRanking.splice(10); // 10위까지만 관리
 			setRanking(newRanking);
 			localStorage.setItem('ranking', JSON.stringify(newRanking));
 			navigate('/ranking');
@@ -141,7 +143,7 @@ function Game() {
 	const ImageWithMarks = ({ src, diffCoordinates }) => (
 		<ImageContainer>
 			<img
-				src={src}
+				src={`${process.env.PUBLIC_URL}${src}`}
 				alt="이미지"
 				width="100%"
 				onMouseDown={(e) => handleImageMouseDown(e, diffCoordinates)}

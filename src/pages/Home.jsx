@@ -64,7 +64,7 @@ function Home() {
 		<CenteredContainer maxWidth="sm" onClick={handleCircleClick}>
 			<Circle className={animate ? 'animate' : ''}>
 				<Contents>
-					<h1>명조 틀린그림찾기</h1>
+					<h1>틀린 그림 찾기</h1>
 				</Contents>
 			</Circle>
 		</CenteredContainer>

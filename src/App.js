@@ -1,6 +1,6 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import Home from './pages/Home';
 import NameInput from './pages/NameInput';
@@ -14,16 +14,14 @@ import 'swiper/css/navigation'; // Swiper Navigation CSS 임포트
 
 function App() {
 	return (
-		<Router>
-			<Layout>
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/name-input" element={<NameInput />} />
-					<Route path="/game" element={<Game />} />
-					<Route path="/ranking" element={<Ranking />} />
-				</Routes>
-			</Layout>
-		</Router>
+		<Layout>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/name-input" element={<NameInput />} />
+				<Route path="/game" element={<Game />} />
+				<Route path="/ranking" element={<Ranking />} />
+			</Routes>
+		</Layout>
 	);
 }
 
