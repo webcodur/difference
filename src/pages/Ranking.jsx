@@ -1,14 +1,21 @@
 // src/pages/Ranking.js
 import React from 'react';
 import { Container } from '@mui/material';
-import RankingList from '../components/RankingList';
+import RankingList from 'components/RankingList';
+import styled from '@emotion/styled';
+
+export const RankContainer = styled.div`
+	margin-top: 3vh;
+	height: 80vh;
+  text-align: center;
+`;
 
 function Ranking() {
 	return (
-		<Container maxWidth="sm">
-			<h1>랭킹 화면</h1>
+		<RankContainer maxWidth="sm">
+			<h1 >랭킹 화면</h1>
 			<RankingList />
-		</Container>
+		</RankContainer>
 	);
 }
 

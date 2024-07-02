@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 export const GameContainer = styled.div`
-	margin-top: 10vh;
+	margin-top: 3vh;
 	height: 80vh;
 `;
 

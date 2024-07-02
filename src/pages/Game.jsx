@@ -6,7 +6,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { scoreAtom, userNameAtom, rankingAtom } from '../store';
+import { scoreAtom, userNameAtom, rankingAtom, messageAtom } from '../store';
 import { coordinates } from '../assets/coordinates';
 import {
 	GameContainer,
@@ -17,8 +17,10 @@ import {
 	ProgressContainer,
 	ProgressBar,
 	FoundIconContainer,
-} from './Game.Style';
+	FixedMessageContainer,
+} from './Game.Style.js';
 import { CheckCircleOutline, CircleOutlined } from '@mui/icons-material';
+import { playSingleAudio } from 'utils/playAudio';
 
 const roundTimeLimit = 90; // 라운드 당 시간 제한 (초)
 const incorrectPenalty = 10; // 오답 시 차감 시간 (초)
@@ -27,9 +29,10 @@ function Game() {
 	const [score, setScore] = useAtom(scoreAtom);
 	const [userName] = useAtom(userNameAtom);
 	const [ranking, setRanking] = useAtom(rankingAtom);
+	const [message, setMessage] = useAtom(messageAtom);
 
 	const [round, setRound] = useState(0);
-	const [message, setMessage] = useState('');
+	const [isGameOver, setIsGameOver] = useState(false);
 	const [foundDifferences, setFoundDifferences] = useState([]);
 	const [marks, setMarks] = useState([]);
 	const [timeLeft, setTimeLeft] = useState(roundTimeLimit);
@@ -50,7 +53,17 @@ function Game() {
 		return () => clearInterval(timer);
 	}, [round]);
 
+	const handleMessage = (newMessage) => {
+		if (message === newMessage) {
+			setMessage(' ' + newMessage + ' ');
+		} else {
+			setMessage(newMessage);
+		}
+	};
+
 	const handleImageMouseDown = (event, diffCoordinates) => {
+		if (isGameOver) return;
+
 		const imgElement = event.target;
 		const rect = imgElement.getBoundingClientRect();
 
@@ -88,7 +101,9 @@ function Game() {
 			);
 
 			if (!alreadyFound) {
-				setMessage('정답입니다!');
+				playSingleAudio('click-success.mp3');
+				// setMessage('정답입니다!');
+				handleMessage('정답입니다!');
 				setScore(score + 100); // 각 정답 100점
 				setFoundDifferences([...foundDifferences, { x: actualX, y: actualY }]);
 				setMarks([...marks, mark]);
@@ -97,10 +112,22 @@ function Game() {
 					setTimeout(handleNext, 1000);
 				}
 			} else {
-				setMessage('이미 찾은 차이점입니다!');
+				handleMessage('이미 찾은 차이점입니다!');
 			}
 		} else {
-			setMessage('틀렸습니다!');
+			playSingleAudio('click-fail.mp3');
+			handleMessage('틀렸습니다!');
+
+			if (timeLeft - 15 <= 0) {
+				playSingleAudio('game-over.mp3');
+				handleMessage('game over... 3초 후 메인화면으로 이동');
+				setIsGameOver(true);
+				setTimeout(() => {
+					navigate('/');
+				}, [3000]);
+				return;
+			}
+
 			setTimeLeft((prevTime) => Math.max(prevTime - incorrectPenalty, 0)); // 오답 시 시간 차감
 			setMarks([...marks, mark]);
 
@@ -112,9 +139,15 @@ function Game() {
 
 	const handleNext = () => {
 		if (round < coordinates.length - 1) {
+			const newScore = score + timeLeft * 5;
+			setScore(newScore);
+
+			const msg = `${score} + ${timeLeft * 5} : ${newScore}`;
+			setMessage(msg);
+
 			setRound(round + 1);
 			setFoundDifferences([]);
-			setMessage('');
+
 			setMarks([]);
 			setTimeLeft(roundTimeLimit); // 다음 라운드 타이머 초기화
 		} else {
@@ -222,7 +255,6 @@ function Game() {
 						</SwiperSlide>
 					))}
 				</Swiper>
-				{message && <div>{message}</div>}
 			</>
 		</GameContainer>
 	);
