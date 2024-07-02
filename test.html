@@ -1,0 +1,33 @@
+<style>
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .circle {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+</style>
+
+<body>
+  <script>
+    document.addEventListener('click', function (event) {
+      const circle = document.createElement('div');
+      circle.classList.add('circle');
+      circle.style.left = `${event.clientX}px`;
+      circle.style.top = `${event.clientY}px`;
+      document.body.appendChild(circle);
+    });
+  </script>
+</body>
