@@ -45,7 +45,7 @@ function Game() {
 		const actualX = x * xRatio;
 		const actualY = y * yRatio;
 
-		const clickRadius = 20;
+		const clickRadius = 30;
 
 		const isCorrect = diffCoordinates.some(
 			(diff) =>

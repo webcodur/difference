@@ -16,7 +16,12 @@ const FixedContents = styled.div`
 	position: fixed;
 `;
 
-const StyledContainer = styled(Container)``;
+const StyledContainer = styled.div`
+	margin: 0px;
+	padding: 0px;
+	width: 96%;
+	margin-left: 2%;
+`;
 
 const linkStyle = css`
 	text-decoration: none;
