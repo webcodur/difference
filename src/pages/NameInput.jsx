@@ -1,11 +1,12 @@
 // src/pages/NameInput.js
 import React, { useState } from 'react';
 import { useAtom } from 'jotai';
-import { Link } from 'react-router-dom';
 import { Container, TextField, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { userNameAtom } from '../store';
 import RankingList from '../components/RankingList';
 import styled from '@emotion/styled';
+import { playSingleAudio } from 'utils/playAudio';
 
 const StyledContainer = styled(Container)`
 	text-align: center;
@@ -26,6 +27,7 @@ const StyledDiv = styled.div`
 `;
 
 const StyledButton = styled(Button)`
+	margin-top: 20px;
 	width: 200px;
 	font-family: jua;
 	font-size: 20px;
@@ -39,14 +41,19 @@ const StyledButton = styled(Button)`
 
 function NameInput() {
 	const [, setName] = useAtom(userNameAtom);
-	const [localName, setLocalName] = useState(''); // useState로 로컬 상태 관리
+	const [localName, setLocalName] = useState('');
+	const navigate = useNavigate();
 
 	const handleChange = (event) => {
 		setLocalName(event.target.value);
 	};
 
-	const handleValueToGlobal = () => {
+	const handleGameStart = () => {
 		setName(localName);
+		playSingleAudio('countdown.wav');
+		setTimeout(() => {
+			navigate('/game');
+		}, 3000); // 1초 후 페이지 이동
 	};
 
 	return (
@@ -62,15 +69,13 @@ function NameInput() {
 					margin="normal"
 					autoComplete="off"
 				/>
-				<Link to="/game">
-					<StyledButton
-						variant="contained"
-						color="primary"
-						fullWidth
-						onClick={handleValueToGlobal}>
-						게임 시작
-					</StyledButton>
-				</Link>
+				<StyledButton
+					variant="contained"
+					color="primary"
+					fullWidth
+					onClick={handleGameStart}>
+					게임 시작
+				</StyledButton>
 
 				<RankingList />
 			</StyledDiv>

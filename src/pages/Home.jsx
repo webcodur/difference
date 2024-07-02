@@ -1,8 +1,12 @@
 // src/pages/Home.js
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅을 가져온다.
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container } from '@mui/material';
 import styled from '@emotion/styled';
+import { playSingleAudio } from 'utils/playAudio';
+
+import { useAtom } from 'jotai';
+import { scoreAtom } from '../store';
 
 // 스타일 정의
 const CenteredContainer = styled(Container)`
@@ -12,7 +16,7 @@ const CenteredContainer = styled(Container)`
 	align-items: center;
 	height: 100vh;
 	text-align: center;
-	cursor: pointer; // 클릭 가능하도록 커서 추가
+	cursor: pointer;
 `;
 
 const Circle = styled.div`
@@ -24,14 +28,14 @@ const Circle = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	transition: background 1s; // 배경색 전환 애니메이션 추가
+	transition: background 1s, transform 1s;
 
 	&:hover {
-		background: radial-gradient(
-			circle,
-			lightblue 0%,
-			white 100%
-		); // hover 시 배경색 변경
+		background: radial-gradient(circle, lightblue 0%, white 100%);
+	}
+
+	&.animate {
+		transform: scale(1.1); // 클릭 시 확대되는 애니메이션 추가
 	}
 `;
 
@@ -40,15 +44,25 @@ const Contents = styled.div`
 `;
 
 function Home() {
-	const navigate = useNavigate(); // useNavigate 훅을 사용하여 navigate 함수 생성
+	const navigate = useNavigate();
+	const [animate, setAnimate] = useState(false); // 애니메이션 상태 추가
+	const [, setScore] = useAtom(scoreAtom);
+
+	useEffect(() => {
+		setScore(0);
+	}, [setScore]);
 
 	const handleCircleClick = () => {
-		navigate('/name-input'); // 클릭 시 /name-input 경로로 이동
+		playSingleAudio('anchor.mp3');
+		setAnimate(true); // 애니메이션 트리거 설정
+		setTimeout(() => {
+			navigate('/name-input');
+		}, 1000); // 1초 후 페이지 이동
 	};
 
 	return (
 		<CenteredContainer maxWidth="sm" onClick={handleCircleClick}>
-			<Circle>
+			<Circle className={animate ? 'animate' : ''}>
 				<Contents>
 					<h1>명조 틀린그림찾기</h1>
 				</Contents>

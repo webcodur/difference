@@ -1,5 +1,4 @@
-// Game.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -15,7 +14,14 @@ import {
 	GameInfoWrapper,
 	ImageContainer,
 	ImageMark,
+	ProgressContainer,
+	ProgressBar,
+	FoundIconContainer,
 } from './Game.Style';
+import { CheckCircleOutline, CircleOutlined } from '@mui/icons-material';
+
+const roundTimeLimit = 90; // 라운드 당 시간 제한 (초)
+const incorrectPenalty = 10; // 오답 시 차감 시간 (초)
 
 function Game() {
 	const [score, setScore] = useAtom(scoreAtom);
@@ -26,19 +32,31 @@ function Game() {
 	const [message, setMessage] = useState('');
 	const [foundDifferences, setFoundDifferences] = useState([]);
 	const [marks, setMarks] = useState([]);
-	const [incorrectAttempts, setIncorrectAttempts] = useState(0);
+	const [timeLeft, setTimeLeft] = useState(roundTimeLimit);
+
 	const navigate = useNavigate();
 	const diffCoordinates = coordinates[round];
 
-	const handleImageClick = (event, diffCoordinates) => {
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setTimeLeft((prevTime) => {
+				if (prevTime > 0) return prevTime - 1;
+				else {
+					handleNext();
+					return 0;
+				}
+			});
+		}, 1000);
+		return () => clearInterval(timer);
+	}, [round]);
+
+	const handleImageMouseDown = (event, diffCoordinates) => {
 		const imgElement = event.target;
 		const rect = imgElement.getBoundingClientRect();
 
-		// 클릭 좌표를 이미지 요소의 상대 좌표로 변환
 		const x = event.clientX - rect.left;
 		const y = event.clientY - rect.top;
 
-		// 이미지 요소의 비율을 고려하여 실제 좌표 계산
 		const xRatio = imgElement.naturalWidth / rect.width;
 		const yRatio = imgElement.naturalHeight / rect.height;
 
@@ -58,6 +76,7 @@ function Game() {
 			x: (x / rect.width) * 100,
 			y: (y / rect.height) * 100,
 			correct: isCorrect,
+			id: new Date().getTime(), // 고유 ID 생성
 		};
 
 		if (isCorrect) {
@@ -70,7 +89,7 @@ function Game() {
 
 			if (!alreadyFound) {
 				setMessage('정답입니다!');
-				setScore(score + 1);
+				setScore(score + 100); // 각 정답 100점
 				setFoundDifferences([...foundDifferences, { x: actualX, y: actualY }]);
 				setMarks([...marks, mark]);
 
@@ -81,21 +100,13 @@ function Game() {
 				setMessage('이미 찾은 차이점입니다!');
 			}
 		} else {
-			const alreadyMarked = marks.some(
-				(m) =>
-					Math.sqrt(Math.pow(m.x - mark.x, 2) + Math.pow(m.y - mark.y, 2)) <
-					clickRadius
-			);
+			setMessage('틀렸습니다!');
+			setTimeLeft((prevTime) => Math.max(prevTime - incorrectPenalty, 0)); // 오답 시 시간 차감
+			setMarks([...marks, mark]);
 
-			if (!alreadyMarked) {
-				setMessage('틀렸습니다!');
-				setIncorrectAttempts(incorrectAttempts + 1);
-				setMarks([...marks, mark]);
-
-				setTimeout(() => {
-					setMarks((prevMarks) => prevMarks.filter((m) => m !== mark));
-				}, 1000);
-			}
+			setTimeout(() => {
+				setMarks((prevMarks) => prevMarks.filter((m) => m.id !== mark.id));
+			}, 1000); // 각 마크를 개별적으로 관리하여 일정 시간 후 사라지게 함
 		}
 	};
 
@@ -103,16 +114,16 @@ function Game() {
 		if (round < coordinates.length - 1) {
 			setRound(round + 1);
 			setFoundDifferences([]);
-			setIncorrectAttempts(0);
 			setMessage('');
 			setMarks([]);
+			setTimeLeft(roundTimeLimit); // 다음 라운드 타이머 초기화
 		} else {
 			const newRanking = [
 				...ranking,
 				{
 					name: userName || '익명',
 					score,
-					date: new Date().toLocaleString(), // 현재 날짜와 시간 추가
+					date: new Date().toLocaleString(),
 				},
 			];
 			setRanking(newRanking);
@@ -133,7 +144,9 @@ function Game() {
 				src={src}
 				alt="이미지"
 				width="100%"
-				onClick={(e) => handleImageClick(e, diffCoordinates)}
+				onMouseDown={(e) => handleImageMouseDown(e, diffCoordinates)}
+				draggable="false" // 드래그 방지
+				onDragStart={(e) => e.preventDefault()} // 드래그 방지
 			/>
 			{marks.map((mark, i) => (
 				<ImageMark key={i} x={mark.x} y={mark.y} correct={mark.correct}>
@@ -143,18 +156,46 @@ function Game() {
 		</ImageContainer>
 	);
 
+	const renderFoundIcons = () => {
+		return (
+			<FoundIconContainer>
+				{diffCoordinates.map((_, index) =>
+					foundDifferences.length > index ? (
+						<CheckCircleOutline key={index} color="primary" />
+					) : (
+						<CircleOutlined key={index} color="disabled" />
+					)
+				)}
+			</FoundIconContainer>
+		);
+	};
+
+	const progressBarColor = () => {
+		const percentage = (timeLeft / roundTimeLimit) * 100;
+		if (percentage > 50) return 'green';
+		else if (percentage > 25) return 'yellow';
+		else return 'red';
+	};
+
 	return (
 		<GameContainer>
+			<ProgressContainer>
+				<ProgressBar
+					style={{
+						height: `${(timeLeft / roundTimeLimit) * 100}%`,
+						backgroundColor: progressBarColor(),
+					}}>
+					<div style={{ height: '100%', backgroundColor: 'transparent' }} />
+				</ProgressBar>
+			</ProgressContainer>
 			<>
 				<GameTitle>
 					{round + 1} 라운드 ({round + 1}/{coordinates.length})
 				</GameTitle>
 				<GameInfoWrapper>
-					<p>
-						현재 {diffCoordinates.length}중 {foundDifferences.length}개 찾음
-					</p>
+					{renderFoundIcons()}
 					<p>점수: {score}점</p>
-					<p>오답: {incorrectAttempts}회</p>
+					<p>남은 시간: {timeLeft}초</p>
 				</GameInfoWrapper>
 				<Swiper
 					spaceBetween={50}
