@@ -6,7 +6,7 @@ import { Container } from '@mui/material';
 import styled from '@emotion/styled';
 
 const StyledContainer = styled(Container)`
-	margin-top: 20px;
+	margin-top: 0px;
 	text-align: center;
 `;
 
