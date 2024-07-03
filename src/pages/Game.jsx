@@ -17,7 +17,6 @@ import {
 	ProgressContainer,
 	ProgressBar,
 	FoundIconContainer,
-	FixedMessageContainer,
 } from './Game.Style.js';
 import { CheckCircleOutline, CircleOutlined } from '@mui/icons-material';
 import { playSingleAudio } from 'utils/playAudio';
@@ -76,7 +75,7 @@ function Game() {
 		const actualX = x * xRatio;
 		const actualY = y * yRatio;
 
-		const clickRadius = 30;
+		const clickRadius = 60;
 
 		const isCorrect = diffCoordinates.some(
 			(diff) =>
@@ -184,9 +183,7 @@ function Game() {
 				onDragStart={(e) => e.preventDefault()} // 드래그 방지
 			/>
 			{marks.map((mark, i) => (
-				<ImageMark key={i} x={mark.x} y={mark.y} correct={mark.correct}>
-					{!mark.correct && 'X'}
-				</ImageMark>
+				<ImageMark key={i} x={mark.x} y={mark.y} correct={mark.correct} />
 			))}
 		</ImageContainer>
 	);

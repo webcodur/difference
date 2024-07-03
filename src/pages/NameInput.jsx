@@ -42,6 +42,7 @@ const StyledButton = styled(Button)`
 function NameInput() {
 	const [, setName] = useAtom(userNameAtom);
 	const [localName, setLocalName] = useState('');
+	const [labelName, setLabelName] = useState('이름');
 	const [gameStartText, setGameStartText] = useState('게임 시작');
 	const [isStarting, setIsStarting] = useState(false);
 	const navigate = useNavigate();
@@ -55,6 +56,7 @@ function NameInput() {
 		setIsStarting(true);
 		setName(localName);
 		setGameStartText('3초 후 시작');
+		if (localName === '') setLabelName('익명');
 		playSingleAudio('countdown.wav');
 
 		const countdown = [3, 2, 1];
@@ -66,6 +68,7 @@ function NameInput() {
 
 		setTimeout(() => {
 			navigate('/game');
+			if (localName === '') setName('익명');
 		}, 3000); // 3초 후 페이지 이동
 	};
 
@@ -74,7 +77,7 @@ function NameInput() {
 			<StyledDiv>
 				<h1>이름을 입력하세요</h1>
 				<TextField
-					label="이름"
+					label={labelName}
 					variant="outlined"
 					fullWidth
 					value={localName}

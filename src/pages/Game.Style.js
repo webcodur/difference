@@ -21,17 +21,18 @@ export const ImageContainer = styled.div`
 
 export const ImageMark = styled.div`
 	position: absolute;
-	width: 30px;
-	height: 30px;
-	border-radius: 50%;
-	background-color: ${(props) => (props.correct ? 'red' : 'transparent')};
-	border: ${(props) => (props.correct ? 'none' : '2px solid red')};
-	line-height: 30px;
-	text-align: center;
-	color: red;
+	width: 60px;
+	height: 60px;
+	background-image: ${(props) =>
+		props.correct
+			? `url("${process.env.PUBLIC_URL}/images/alpha_o.png")`
+			: `url("${process.env.PUBLIC_URL}/images/alpha_x.png")`};
+	background-size: contain;
+	background-repeat: no-repeat;
 	top: ${(props) => `${props.y}%`};
 	left: ${(props) => `${props.x}%`};
 	transform: translate(-50%, -50%);
+	z-index: 10;
 `;
 
 export const ProgressContainer = styled.div`

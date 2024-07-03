@@ -1,12 +1,13 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 import { messageAtom } from '../store';
 import { useAtom } from 'jotai';
+import { stopAudio } from 'utils/playAudio';
 
 const FullScreenContainer = styled.div`
 	width: 100vw;
@@ -59,6 +60,13 @@ const FixedMessageContainer = styled.div`
 function Layout({ children }) {
 	const [message] = useAtom(messageAtom);
 	const [showMessage, setShowMessage] = useState(false);
+	const location = useLocation();
+
+	useEffect(() => {
+		if (!location.pathname.includes('Rank')) {
+			stopAudio('applause');
+		}
+	}, [location]);
 
 	useEffect(() => {
 		if (message !== null) {
