@@ -17,7 +17,7 @@ function Ranking() {
 
 	return (
 		<RankContainer maxWidth="sm">
-			<h1>랭킹 화면</h1>
+			<h1>결과를 확인해 보세요!</h1>
 			<RankingList />
 		</RankContainer>
 	);
