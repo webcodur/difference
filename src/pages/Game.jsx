@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -8,18 +8,17 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { scoreAtom, userNameAtom, rankingAtom, messageAtom } from '../store';
 import { coordinates } from '../assets/coordinates';
+import RoundProgress from 'components/roundProgress/RoundProgress';
 import {
 	GameContainer,
 	GameTitle,
 	GameInfoWrapper,
 	ImageContainer,
 	ImageMark,
-	ProgressContainer,
-	ProgressBar,
-	FoundIconContainer,
-} from './Game.Style.js';
-import { CheckCircleOutline, CircleOutlined } from '@mui/icons-material';
+} from 'styles/GameStyle';
+
 import { playSingleAudio } from 'utils/playAudio';
+import RoundTime from 'components/RoundTime';
 
 const roundTimeLimit = 90; // 라운드 당 시간 제한 (초)
 const incorrectPenalty = 10; // 오답 시 차감 시간 (초)
@@ -35,9 +34,55 @@ function Game() {
 	const [foundDifferences, setFoundDifferences] = useState([]);
 	const [marks, setMarks] = useState([]);
 	const [timeLeft, setTimeLeft] = useState(roundTimeLimit);
+	const swiperRef = useRef(null);
 
 	const navigate = useNavigate();
 	const diffCoordinates = coordinates[round];
+
+	const handleNext = useCallback(() => {
+		// 다음 라운드
+		if (round < coordinates.length - 1) {
+			const newScore = score + timeLeft * 5;
+			setScore(newScore);
+
+			const msg = `${score} + ${timeLeft * 5} : ${newScore}`;
+			setMessage(msg);
+
+			setRound(round + 1);
+			setFoundDifferences([]);
+
+			setMarks([]);
+			setTimeLeft(roundTimeLimit);
+			swiperRef.current.slideNext();
+		}
+
+		// 게임 종료
+		else {
+			const newRanking = [
+				...ranking,
+				{
+					name: userName || '익명',
+					score,
+					date: new Date().toLocaleString(),
+				},
+			].sort((a, b) => b.score - a.score);
+
+			if (newRanking.length > 10) newRanking.splice(10);
+			setRanking(newRanking);
+			localStorage.setItem('ranking', JSON.stringify(newRanking));
+			navigate('/ranking');
+		}
+	}, [
+		navigate,
+		ranking,
+		round,
+		score,
+		setMessage,
+		setRanking,
+		setScore,
+		timeLeft,
+		userName,
+	]);
 
 	useEffect(() => {
 		const timer = setInterval(() => {
@@ -50,14 +95,12 @@ function Game() {
 			});
 		}, 1000);
 		return () => clearInterval(timer);
-	}, [round]);
+	}, [handleNext, round]);
 
 	const handleMessage = (newMessage) => {
-		if (message === newMessage) {
-			setMessage(' ' + newMessage + ' ');
-		} else {
-			setMessage(newMessage);
-		}
+		message === newMessage
+			? setMessage(' ' + newMessage + ' ')
+			: setMessage(newMessage);
 	};
 
 	const handleImageMouseDown = (event, diffCoordinates) => {
@@ -136,42 +179,6 @@ function Game() {
 		}
 	};
 
-	const handleNext = () => {
-		if (round < coordinates.length - 1) {
-			const newScore = score + timeLeft * 5;
-			setScore(newScore);
-
-			const msg = `${score} + ${timeLeft * 5} : ${newScore}`;
-			setMessage(msg);
-
-			setRound(round + 1);
-			setFoundDifferences([]);
-
-			setMarks([]);
-			setTimeLeft(roundTimeLimit); // 다음 라운드 타이머 초기화
-		} else {
-			const newRanking = [
-				...ranking,
-				{
-					name: userName || '익명',
-					score,
-					date: new Date().toLocaleString(),
-				},
-			].sort((a, b) => b.score - a.score); // 점수 내림차순 정렬
-
-			if (newRanking.length > 10) newRanking.splice(10); // 10위까지만 관리
-			setRanking(newRanking);
-			localStorage.setItem('ranking', JSON.stringify(newRanking));
-			navigate('/ranking');
-		}
-	};
-
-	const handleSlideChange = (swiper) => {
-		if (swiper.activeIndex !== round) {
-			swiper.slideTo(round);
-		}
-	};
-
 	const ImageWithMarks = ({ src, diffCoordinates }) => (
 		<ImageContainer>
 			<img
@@ -188,44 +195,18 @@ function Game() {
 		</ImageContainer>
 	);
 
-	const renderFoundIcons = () => {
-		return (
-			<FoundIconContainer>
-				{diffCoordinates.map((_, index) =>
-					foundDifferences.length > index ? (
-						<CheckCircleOutline key={index} color="primary" />
-					) : (
-						<CircleOutlined key={index} color="disabled" />
-					)
-				)}
-			</FoundIconContainer>
-		);
-	};
-
-	const progressBarColor = () => {
-		const percentage = (timeLeft / roundTimeLimit) * 100;
-		if (percentage > 50) return 'green';
-		else if (percentage > 25) return 'yellow';
-		else return 'red';
-	};
-
 	return (
 		<GameContainer>
-			<ProgressContainer>
-				<ProgressBar
-					style={{
-						height: `${(timeLeft / roundTimeLimit) * 100}%`,
-						backgroundColor: progressBarColor(),
-					}}>
-					<div style={{ height: '100%', backgroundColor: 'transparent' }} />
-				</ProgressBar>
-			</ProgressContainer>
+			<RoundTime timeLeft={timeLeft} roundTimeLimit={roundTimeLimit} />
 			<>
 				<GameTitle>
 					{round + 1} 라운드 ({round + 1}/{coordinates.length})
 				</GameTitle>
 				<GameInfoWrapper>
-					{renderFoundIcons()}
+					<RoundProgress
+						diffCoordinates={diffCoordinates}
+						foundDifferences={foundDifferences}
+					/>
 					<p>점수: {score}점</p>
 					<p>남은 시간: {timeLeft}초</p>
 				</GameInfoWrapper>
@@ -235,17 +216,19 @@ function Game() {
 					navigation={false}
 					pagination={{ clickable: true }}
 					scrollbar={{ draggable: true }}
-					onSlideChange={handleSlideChange}
+					onSwiper={(swiper) => {
+						swiperRef.current = swiper;
+					}}
 					allowTouchMove={false}>
 					{coordinates.map((_, index) => (
 						<SwiperSlide key={index}>
 							<div style={{ display: 'flex', justifyContent: 'space-between' }}>
 								<ImageWithMarks
-									src={`/images/img${round + 1}1.jpg`}
+									src={`/images/img${index + 1}1.jpg`}
 									diffCoordinates={diffCoordinates}
 								/>
 								<ImageWithMarks
-									src={`/images/img${round + 1}2.jpg`}
+									src={`/images/img${index + 1}2.jpg`}
 									diffCoordinates={diffCoordinates}
 								/>
 							</div>
