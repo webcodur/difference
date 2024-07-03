@@ -17,7 +17,8 @@ import {
 	ImageMark,
 } from 'styles/GameStyle';
 
-import { playSingleAudio } from 'utils/playAudio';
+// import { playSingleAudio } from 'utils/playAudio';
+import { playSingleAudio, preloadAudio } from 'utils/playAudio';
 import RoundTime from 'components/RoundTime';
 
 const roundTimeLimit = 90; // 라운드 당 시간 제한 (초)
@@ -38,6 +39,12 @@ function Game() {
 
 	const navigate = useNavigate();
 	const diffCoordinates = coordinates[round];
+
+	useEffect(() => {
+		preloadAudio('click-success.mp3');
+		preloadAudio('click-fail.mp3');
+		preloadAudio('game-over.mp3');
+	}, []);
 
 	const handleNext = useCallback(() => {
 		// 다음 라운드

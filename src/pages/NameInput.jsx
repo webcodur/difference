@@ -1,12 +1,12 @@
 // src/pages/NameInput.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { Container, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { userNameAtom } from '../store';
 import RankingList from '../components/RankingList';
 import styled from '@emotion/styled';
-import { playSingleAudio } from 'utils/playAudio';
+import { playSingleAudio, preloadAudio } from 'utils/playAudio';
 
 const StyledContainer = styled(Container)`
 	text-align: center;
@@ -71,6 +71,10 @@ function NameInput() {
 			if (localName === '') setName('익명');
 		}, 3000); // 3초 후 페이지 이동
 	};
+
+	useEffect(() => {
+		preloadAudio('countdown.wav');
+	}, []);
 
 	return (
 		<StyledContainer maxWidth="sm">

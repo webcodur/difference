@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { playSingleAudio } from 'utils/playAudio';
+import { playSingleAudio, preloadAudio } from 'utils/playAudio';
 import { CenteredContainer, Circle, Contents } from 'styles/HomeStyle';
 
 import { useAtom } from 'jotai';
@@ -15,6 +15,7 @@ function Home() {
 
 	useEffect(() => {
 		setScore(0);
+		preloadAudio('anchor.mp3'); // 오디오 파일 미리 로드
 	}, [setScore]);
 
 	const handleCircleClick = () => {
