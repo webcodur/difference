@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/game-difference/static/css/main.adb92af4.css",
-    "main.js": "/game-difference/static/js/main.1f2afc9c.js",
+    "main.js": "/game-difference/static/js/main.fb1edea6.js",
     "index.html": "/game-difference/index.html",
     "main.adb92af4.css.map": "/game-difference/static/css/main.adb92af4.css.map",
-    "main.1f2afc9c.js.map": "/game-difference/static/js/main.1f2afc9c.js.map"
+    "main.fb1edea6.js.map": "/game-difference/static/js/main.fb1edea6.js.map"
   },
   "entrypoints": [
     "static/css/main.adb92af4.css",
-    "static/js/main.1f2afc9c.js"
+    "static/js/main.fb1edea6.js"
   ]
 }
